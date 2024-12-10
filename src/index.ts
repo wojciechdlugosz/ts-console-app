@@ -13,6 +13,11 @@ enum Action {
     Error = 'error',
     Info = 'info',
   }
+
+  interface User {
+    name: string;
+    age: number;
+  }
   
   type InquirerAnswers = {
     action: Action
@@ -54,7 +59,7 @@ class Message {
       this.content = this.content.toLowerCase();
     }
   
-    public showColorized(variant: MessageVariant, text: string): void {
+    static showColorized(variant: MessageVariant, text: string): void {
       switch (variant) {
         case MessageVariant.Success:
           consola.success(text);
@@ -69,6 +74,43 @@ class Message {
           console.error('Unsupported color variant');
       }
     }
+  };
+
+
+class UsersData {
+  private data: User[] = [];
+
+  public showAll(): void {
+    Message.showColorized(MessageVariant.Info, 'Users data');
+    if (this.data.length > 0) {
+      console.table(this.data);
+    } else {
+      console.log('No data...');
+    }
   }
+
+  public add(user: User): void {
+    if (this.isValidUser(user)) {
+      this.data.push(user);
+      Message.showColorized(MessageVariant.Success, 'User has been successfully added!');
+    } else {
+      Message.showColorized(MessageVariant.Error, 'Wrong data!');
+    }
+  }
+
+  public remove(userName: string): void {
+    const userIndex = this.data.findIndex(user => user.name === userName);
+    if (userIndex !== -1) {
+      this.data.splice(userIndex, 1);
+      Message.showColorized(MessageVariant.Success, 'User deleted!');
+    } else {
+      Message.showColorized(MessageVariant.Error, 'User not found...');
+    }
+  }
+
+  private isValidUser(user: User): boolean {
+    return user.age > 0 && user.name.length > 0;
+  }
+}
 
 startApp();
